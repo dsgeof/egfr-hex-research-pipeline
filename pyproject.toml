@@ -1,0 +1,35 @@
+[project]
+name = "egfr-hex"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Duncan Freeman", email = "dsgfreeman@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "joblib>=1.5.3",
+    "openai-agents>=0.22.0",
+    "pandas>=3.0.5",
+    "pydantic>=2.13.4",
+    "pydantic-settings>=2.15.0",
+    "rich>=15.0.0",
+    "scikit-learn>=1.9.0",
+    "typer>=0.27.1",
+]
+
+[project.scripts]
+egfr-hex = "egfr_hex:main"
+
+[build-system]
+requires = ["uv_build>=0.9.21,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "import-linter>=2.13",
+    "mypy>=2.3.1",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.5",
+]

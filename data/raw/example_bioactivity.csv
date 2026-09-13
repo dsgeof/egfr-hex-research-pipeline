@@ -1,0 +1,11 @@
+compound_id,smiles,activity_label
+CMP-001,CCO,0
+CMP-002,CCN,0
+CMP-003,CCCO,0
+CMP-004,c1ccccc1,0
+CMP-005,CC(=O)O,0
+CMP-006,CN1CCC(CC1)O,1
+CMP-007,CCOc1ccc2nc(S(N)(=O)=O)sc2c1,1
+CMP-008,CC1=CC=C(C=C1)NC(=O)N,1
+CMP-009,COc1ccc(NC(=O)C2CC2)cc1,1
+CMP-010,CCN(CC)C(=O)c1ccccc1,1
