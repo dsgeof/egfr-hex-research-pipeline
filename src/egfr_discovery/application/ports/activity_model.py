@@ -4,7 +4,9 @@ from egfr_discovery.domain.compound import Compound
 from egfr_discovery.domain.prediction import ActivityPrediction
 
 # Port
-# Protocol defining the interface for an activity prediction model.
+# Protocol defining the interface for an activity prediction ml model.
+# This protocol can be implemented by any machine learning model that predicts activity for compounds.
+# CSV → training service → model artifact → predictions
 class ActivityModel(Protocol):
     def train(
         self,

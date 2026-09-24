@@ -9,6 +9,7 @@ from egfr_discovery.application.use_cases.train_activity_model import (
 from egfr_discovery.bootstrap.container import build_train_activity_model
 from egfr_discovery.domain.compound import Compound
 
+# CLI adapter for training an activity prediction model from a CSV file.
 def train_from_csv(
     source: str = "data/raw/example_bioactivity.csv",
     destination: str = "artifacts/models/example_model.joblib",

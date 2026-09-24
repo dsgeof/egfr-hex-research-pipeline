@@ -13,17 +13,21 @@ dependencies = [
     "pandas>=3.0.5",
     "pydantic>=2.13.4",
     "pydantic-settings>=2.15.0",
+    "rdkit",
     "rich>=15.0.0",
     "scikit-learn>=1.9.0",
     "typer>=0.27.1",
 ]
 
 [project.scripts]
-egfr-hex = "egfr_hex:main"
+egfr-hex = "egfr_discovery.main:main"
 
 [build-system]
 requires = ["uv_build>=0.9.21,<0.10.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "egfr_discovery"
 
 [dependency-groups]
 dev = [

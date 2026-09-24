@@ -4,6 +4,8 @@ from typing import Sequence
 from egfr_discovery.application.ports.activity_model import ActivityModel
 from egfr_discovery.domain.compound import Compound
 
+# Use case for training an activity prediction model.
+
 @dataclass(frozen=True, slots=True)
 class TrainingRecord:
     compound: Compound
