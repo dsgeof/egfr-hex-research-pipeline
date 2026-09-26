@@ -1,3 +1,4 @@
+import os
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -10,7 +11,9 @@ from egfr_discovery.config import Settings, get_settings
 @pytest.fixture(autouse=True)
 def isolate_settings(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     get_settings.cache_clear()
-    monkeypatch.delenv("CHEMBL_CLIENT_BASE_URL", raising=False)
+    for name in tuple(os.environ):
+        if name.casefold() == "chembl_client_base_url":
+            monkeypatch.delenv(name)
     yield
     get_settings.cache_clear()
 
