@@ -1,0 +1,14 @@
+{
+  "total_records": 26600,
+  "accepted": 0,
+  "wrong_activity_type": 0,
+  "non_exact_relation": 6881,
+  "wrong_units": 73,
+  "missing_value": 3,
+  "missing_smiles": 19643,
+  "invalid_smiles": 0,
+  "mixtures": 0,
+  "missing_assay": 0,
+  "low_target_confidence": 0,
+  "errors": []
+}

@@ -1,37 +1,53 @@
 from dataclasses import dataclass
-from typing import Sequence
 
 from egfr_discovery.application.ports.activity_model import ActivityModel
 from egfr_discovery.domain.compound import Compound
+from egfr_discovery.domain.dataset import CuratedDataset
 
-# Use case for training an activity prediction model.
 
 @dataclass(frozen=True, slots=True)
-class TrainingRecord:
-    compound: Compound
-    activity_label: int
+class TrainModelResult:
+    model_id: str
+    training_size: int
+    model_path: str
 
 @dataclass(frozen=True, slots=True)
-class TrainActivityModelCommand:
-    records: Sequence[TrainingRecord]
-    model_destination: str
-
-
+class DatasetSplit:
+    train: CuratedDataset
+    validation: CuratedDataset 
+    
 class TrainActivityModel:
     def __init__(self, model: ActivityModel) -> None:
         self._model = model
 
-    # Execute the training process for the activity model using the provided command.
-    def execute(self, command: TrainActivityModelCommand) -> None:
+    def execute(self, dataset: CuratedDataset) -> TrainModelResult:
 
-        if not command.records:
-            raise ValueError("Training records cannot be empty")
-        # Extract compounds and activity labels from the training records.
-        compounds = [record.compound for record in command.records]
-        labels = [record.activity_label for record in command.records]
+        compounds = [
+            Compound(
+                compound_id=m.compound_id,
+                smiles=m.smiles,
+            )
+            for m in dataset.measurements
+        ]
 
-        if len(set(labels)) < 2:
-            raise ValueError("Training requires both active and inactive records")
-        # Train the model with the extracted compounds and labels.
-        self._model.train(compounds, labels)
-        self._model.save(command.model_destination)
+        labels = [
+            m.pic50
+            for m in dataset.measurements
+        ]
+
+        self._model.fit(
+            compounds,
+            labels,
+        )
+
+        model_path = (
+            f"artifacts/models/{dataset.dataset_id}.joblib"
+        )
+
+        self._model.save(model_path)
+
+        return TrainModelResult(
+            model_id=f"{dataset.dataset_id}-model",
+            training_size=len(compounds),
+            model_path=model_path,
+        )

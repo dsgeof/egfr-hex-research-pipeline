@@ -1,6 +1,14 @@
 from typing import Protocol
+from egfr_discovery.adapters.outbound.chembl.models import (
+    ChEMBLActivityRecord,
+)
+
 
 class BioactivitySource(Protocol):
-
-    def get_activity_records(self, target_id: str) -> list[RawActivityRecord]:
+    def fetch(
+        self,
+        *,
+        target_id: str,
+        activity_type: str,
+    ) -> list[ChEMBLActivityRecord]:
         ...

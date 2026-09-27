@@ -22,3 +22,5 @@ class RDKitDescriptorCalculator:
                 rdMolDescriptors.CalcTPSA(molecule)
             ),
         )
+
+
