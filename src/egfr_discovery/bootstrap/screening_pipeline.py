@@ -49,10 +49,15 @@ from egfr_discovery.application.use_cases.validate_activity_model import (
 from egfr_discovery.config import get_settings
 
 
-def build_screening_pipeline(
-    client: ChEMBLClient,
-    command: ScreeningPipelineCommand,
-) -> RunScreeningPipeline:
+def build_screening_pipeline(client: ChEMBLClient, command: ScreeningPipelineCommand) -> RunScreeningPipeline:
+    """Builds and returns a screening pipeline configured with the given client and command.
+    Args:
+        client: An instance of ChEMBLClient used to fetch bioactivity data.
+        command: A ScreeningPipelineCommand object containing configuration for the pipeline.
+
+    Returns:
+        An instance of RunScreeningPipeline configured with the given client and command.
+    """
     model = SklearnActivityModel(random_seed=command.random_seed)
     fingerprints = RDKitFingerprintCalculator()
     return RunScreeningPipeline(
@@ -78,6 +83,14 @@ def build_screening_pipeline(
 
 
 def run_pipeline(command: ScreeningPipelineCommand) -> ScreeningPipelineResult:
+    """Runs the screening pipeline with the given command.
+
+    Args:
+        command: A ScreeningPipelineCommand object containing configuration for the pipeline.
+
+    Returns:
+        A ScreeningPipelineResult object containing the results of the pipeline execution.
+    """
     base_url = str(get_settings().chembl_client_base_url)
     with ChEMBLClient(base_url) as client:
         pipeline = build_screening_pipeline(client, command)
