@@ -22,6 +22,7 @@ dependencies = [
 
 [project.scripts]
 egfr-hex = "egfr_discovery.main:main"
+egfr-screen = "egfr_discovery.adapters.inbound.cli.screen:main"
 
 [build-system]
 requires = ["uv_build>=0.9.21,<0.10.0"]
@@ -29,6 +30,28 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 module-name = "egfr_discovery"
+
+[tool.importlinter]
+root_packages = ["egfr_discovery"]
+
+[[tool.importlinter.contracts]]
+name = "Domain does not depend on outer layers"
+type = "forbidden"
+source_modules = ["egfr_discovery.domain"]
+forbidden_modules = [
+    "egfr_discovery.application",
+    "egfr_discovery.adapters",
+    "egfr_discovery.bootstrap",
+]
+
+[[tool.importlinter.contracts]]
+name = "Application does not depend on adapters or bootstrap"
+type = "forbidden"
+source_modules = ["egfr_discovery.application"]
+forbidden_modules = [
+    "egfr_discovery.adapters",
+    "egfr_discovery.bootstrap",
+]
 
 [dependency-groups]
 dev = [

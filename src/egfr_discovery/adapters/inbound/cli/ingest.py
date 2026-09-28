@@ -1,16 +1,12 @@
 from egfr_discovery.application.use_cases.ingest_bioactivity_data import (
     IngestBioactivityCommand,
 )
-from egfr_discovery.bootstrap.ingest import (
-    build_ingestion_use_case,
-)
+from egfr_discovery.bootstrap.ingest import run_ingestion
 
 
 def main() -> None:
 
-    use_case = build_ingestion_use_case()
-
-    result = use_case.execute(
+    result = run_ingestion(
         IngestBioactivityCommand(
             target_id="CHEMBL203",
             activity_type="IC50",

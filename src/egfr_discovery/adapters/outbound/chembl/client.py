@@ -1,18 +1,18 @@
 from __future__ import annotations
-from typing import Any
+
+from types import TracebackType
+from typing import Any, Self
+
 import httpx
-
-from egfr_discovery.config import get_settings
-
 
 
 class ChEMBLClient:
-    BASE_URL = get_settings().chembl_client_base_url
-
     def __init__(
         self,
+        base_url: str,
         timeout: float = 30.0,
     ) -> None:
+        self._base_url = base_url.rstrip("/")
         self._client = httpx.Client(
             timeout=timeout,
             headers={
@@ -20,6 +20,17 @@ class ChEMBLClient:
                 "User-Agent": "egfr-discovery/0.1",
             },
         )
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(
+        self,
+        exception_type: type[BaseException] | None,
+        exception: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        self.close()
 
     def close(self) -> None:
         self._client.close()
@@ -37,7 +48,7 @@ class ChEMBLClient:
 
         while True:
             response = self._client.get(
-                f"{self.BASE_URL}/activity.json",
+                f"{self._base_url}/activity.json",
                 params={
                     "target_chembl_id": target_chembl_id,
                     "standard_type": standard_type,

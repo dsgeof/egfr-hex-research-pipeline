@@ -1,6 +1,7 @@
 from typing import Protocol
-from egfr_discovery.adapters.outbound.chembl.models import (
-    ChEMBLActivityRecord,
+
+from egfr_discovery.application.dto.external_bioactivity import (
+    ExternalBioactivityRecord,
 )
 
 
@@ -10,5 +11,4 @@ class BioactivitySource(Protocol):
         *,
         target_id: str,
         activity_type: str,
-    ) -> list[ChEMBLActivityRecord]:
-        ...
+    ) -> list[ExternalBioactivityRecord]: ...

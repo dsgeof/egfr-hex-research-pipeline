@@ -1,10 +1,5 @@
 from math import sqrt
 
-from sklearn.metrics import (
-    mean_absolute_error,
-    mean_squared_error,
-    r2_score,
-)
 from egfr_discovery.application.dto.model_results import (
     ModelValidationResult,
     RegressionMetrics,
@@ -15,64 +10,38 @@ from egfr_discovery.domain.dataset import CuratedDataset
 
 
 class ValidateActivityModel:
-
     def __init__(self, model: ActivityModel, max_mae: float = 1.0) -> None:
         self._model = model
         self._max_mae = max_mae
 
     def execute(self, validation_dataset: CuratedDataset) -> ModelValidationResult:
-
         compounds = [
-            Compound(
-                compound_id=m.compound_id,
-                smiles=m.smiles,
-            )
-            for m in validation_dataset.measurements
+            Compound(compound_id=item.compound_id, smiles=item.smiles)
+            for item in validation_dataset.measurements
         ]
+        expected = [item.pic50 for item in validation_dataset.measurements]
+        predicted = [item.predicted_pic50 for item in self._model.predict(compounds)]
+        if len(expected) != len(predicted):
+            raise ValueError("Model returned an unexpected number of predictions")
 
-        expected = [
-            m.pic50
-            for m in validation_dataset.measurements
+        errors = [
+            actual - prediction
+            for actual, prediction in zip(expected, predicted, strict=True)
         ]
+        mae = sum(abs(error) for error in errors) / len(errors)
+        rmse = sqrt(sum(error**2 for error in errors) / len(errors))
+        expected_mean = sum(expected) / len(expected)
+        total_variance = sum((value - expected_mean) ** 2 for value in expected)
+        residual_variance = sum(error**2 for error in errors)
+        r2 = 0.0 if total_variance == 0 else 1 - residual_variance / total_variance
 
-        predictions = self._model.predict(compounds)
-
-        predicted = [
-            p.predicted_pic50
-            for p in predictions
-        ]
-
-        mae = mean_absolute_error(
-            expected,
-            predicted,
+        failures = (
+            (f"MAE {mae:.3f} exceeds maximum {self._max_mae:.3f}",)
+            if mae > self._max_mae
+            else ()
         )
-
-        rmse = sqrt(
-            mean_squared_error(
-                expected,
-                predicted,
-            )
-        )
-
-        r2 = r2_score(
-            expected,
-            predicted,
-        )
-
-        failures: list[str] = []
-
-        if mae > self._max_mae:
-            failures.append(
-                f"MAE {mae:.3f} exceeds "
-                f"maximum {self._max_mae:.3f}"
-            )
-
         return ModelValidationResult(
             passed=not failures,
-            metrics=RegressionMetrics(
-                mae=mae,
-                rmse=rmse,
-                r2=r2,
-            ),
-            failures=tuple(failures),
+            metrics=RegressionMetrics(mae=mae, rmse=rmse, r2=r2),
+            failures=failures,
         )
