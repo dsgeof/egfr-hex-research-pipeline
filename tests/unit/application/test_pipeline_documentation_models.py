@@ -35,12 +35,38 @@ def build_documentation(
 
 
 @pytest.mark.parametrize("field", ["key", "heading", "body"])
-def test_section_rejects_non_string_or_whitespace_only_values(field: str) -> None:
+def test_section_rejects_whitespace_only_values(field: str) -> None:
     values = {"key": "key", "heading": "Heading", "body": "Body"}
     values[field] = "  \t  "
 
     with pytest.raises(ValidationError):
         PipelineDocumentationSection(**values)
+
+
+@pytest.mark.parametrize("field", ["key", "heading", "body"])
+def test_section_rejects_non_string_values(field: str) -> None:
+    values = {"key": "key", "heading": "Heading", "body": "Body"}
+    values[field] = 123
+
+    with pytest.raises(ValidationError):
+        PipelineDocumentationSection(**values)
+
+
+@pytest.mark.parametrize("field", ["pipeline_id", "title", "summary"])
+@pytest.mark.parametrize("value", ["  \t  ", 123])
+def test_documentation_rejects_blank_or_non_string_metadata(
+    field: str, value: object
+) -> None:
+    values = {
+        "pipeline_id": "pipeline-1",
+        "title": "Pipeline documentation",
+        "summary": "A plain-language pipeline summary.",
+        "sections": build_sections(),
+    }
+    values[field] = value
+
+    with pytest.raises(ValidationError):
+        PipelineDocumentation(**values)
 
 
 def test_documentation_rejects_missing_required_section_and_names_key() -> None:
@@ -86,3 +112,22 @@ def test_additional_section_is_accepted_and_remains_last() -> None:
         *REQUIRED_PIPELINE_SECTION_KEYS,
         "limitations",
     )
+
+
+@pytest.mark.parametrize(
+    ("model", "field", "value"),
+    [
+        (build_section("plain_language_summary"), "key", "updated"),
+        (build_documentation(), "title", "Updated title"),
+        (
+            PipelineDocumentationRegistry(pipelines=(build_documentation(),)),
+            "pipelines",
+            (),
+        ),
+    ],
+)
+def test_documentation_models_are_frozen(
+    model: object, field: str, value: object
+) -> None:
+    with pytest.raises(ValidationError, match="frozen"):
+        setattr(model, field, value)
