@@ -5,7 +5,8 @@
 Add an extensible, deterministic developer tool that generates a root-level
 `pipelines.md` describing every registered end-to-end screening pipeline.
 The initial document will describe the existing EGFR screening pipeline using
-the five scientific and drug-discovery topics requested by the project owner.
+a plain-language overview followed by the five scientific and drug-discovery
+topics requested by the project owner.
 
 ## Scope
 
@@ -17,6 +18,8 @@ The feature will:
 
 - Define typed pipeline and section metadata.
 - Register the existing EGFR screening pipeline.
+- Give learners a simple explanation of what each pipeline does and why it is
+  useful in drug discovery.
 - Render all registered pipelines to deterministic Markdown.
 - Provide a developer command that writes root-level `pipelines.md`.
 - Provide a non-mutating check mode that detects a missing or stale document.
@@ -43,7 +46,7 @@ pipeline adapters. The existing pipeline will not import the documentation
 subsystem. This keeps documentation generation out of scientific execution
 and preserves the repository's hexagonal dependency rules.
 
-The metadata will model sections as an ordered collection rather than five
+The metadata will model sections as an ordered collection rather than fixed
 hard-coded properties. Each section will have a stable key, a display heading,
 and Markdown content. The registry will validate the required section keys,
 while the renderer will accept additional sections without code changes.
@@ -63,13 +66,14 @@ Each section will contain:
 - A non-empty Markdown heading.
 - A non-empty Markdown body.
 
-The five required keys will be:
+The six required keys will be:
 
-1. `inputs`
-2. `prediction_and_features`
-3. `models_and_rationale`
-4. `drug_discovery_use`
-5. `drug_discovery_value`
+1. `plain_language_summary`
+2. `inputs`
+3. `prediction_and_features`
+4. `models_and_rationale`
+5. `drug_discovery_use`
+6. `drug_discovery_value`
 
 Validation will reject duplicate pipeline IDs, duplicate section keys, blank
 values, and missing required sections. Additional unique sections will be
@@ -80,6 +84,23 @@ straightforward.
 
 The first registry entry will document the existing EGFR screening pipeline
 accurately and conservatively.
+
+### Plain-language summary for learners
+
+The first section will explain the complete workflow for someone learning drug
+discovery. It will say, in simple terms, that the pipeline learns patterns from
+previous laboratory measurements of compounds tested against EGFR, estimates
+which compounds in a new list may be more active, removes candidates with
+unfavorable basic properties, avoids returning many highly similar compounds,
+and produces a shortlist for experimental follow-up.
+
+It will explain why this is useful: laboratory testing is costly and slow, so a
+computational pipeline can help researchers decide which compounds to test
+first. It will also explain that the output is a prioritization aid rather than
+proof that a compound works. Unavoidable terms such as EGFR, IC50, pIC50, and
+SMILES will either be defined on first use or deferred to the technical
+sections. The section will use short sentences and will not assume machine-
+learning or medicinal-chemistry knowledge.
 
 ### Input summary
 
@@ -128,7 +149,8 @@ The renderer will produce stable output with:
 - A document title and short purpose statement.
 - The research-only disclaimer near the beginning.
 - One second-level heading per registered pipeline.
-- The pipeline summary followed by its ordered section headings and bodies.
+- The pipeline summary followed by its ordered section headings and bodies,
+  beginning with the learner-focused plain-language summary.
 - Exactly one trailing newline.
 
 Pipeline order will follow registry order. Section order will follow the
@@ -181,6 +203,8 @@ Unit tests will verify:
 - An additional custom section is accepted and rendered in order.
 - Rendering is deterministic and contains the generated-file notice and
   research-only disclaimer.
+- The plain-language summary explains what the pipeline does and why it is
+  useful without assuming drug-discovery or machine-learning knowledge.
 - The EGFR registry entry names pIC50, character-level SMILES TF-IDF n-grams,
   `RandomForestRegressor`, tree-level model dispersion, descriptor filtering,
   fingerprint diversity selection, ranking, and experimental follow-up.
@@ -201,7 +225,7 @@ architecture contracts, the generation check command, and `git diff --check`.
 ## Extension workflow
 
 To document a new end-to-end screening pipeline, a contributor will add one
-typed registry entry with the five required sections, add any pipeline-specific
+typed registry entry with the six required sections, add any pipeline-specific
 sections, regenerate `pipelines.md`, and run check mode. To add a new required
 topic globally, the contributor will add its stable key to the required-key
 collection and provide that section for every registered pipeline. The
