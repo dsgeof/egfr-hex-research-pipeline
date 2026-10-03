@@ -23,6 +23,7 @@ dependencies = [
 [project.scripts]
 egfr-hex = "egfr_discovery.main:main"
 egfr-screen = "egfr_discovery.adapters.inbound.cli.screen:main"
+egfr-pipeline-docs = "egfr_discovery.adapters.inbound.cli.pipeline_docs:main"
 
 [build-system]
 requires = ["uv_build>=0.9.21,<0.10.0"]
